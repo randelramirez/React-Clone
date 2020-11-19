@@ -46,7 +46,7 @@ class Messages extends React.Component {
 
   render() {
     const { messageCollection, channel, user, messages } = this.state;
-    console.log('messages', messages);
+
     return (
       <React.Fragment>
         <MessagesHeader />

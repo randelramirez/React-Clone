@@ -32,10 +32,8 @@ class MessageForm extends Component {
   sendMessage = () => {
     // const { msessageCollection } = this.props; // does not work, so we create an instance here
     const msessageCollection = firebase.database().ref('messages');
-
     const { message, channel } = this.state;
 
-    console.log({ channel });
     if (message) {
       this.setState({ loading: true });
       msessageCollection
@@ -60,7 +58,6 @@ class MessageForm extends Component {
   };
 
   createMessage = (fileUrl = null) => {
-    console.log('creating message');
     const message = {
       timeStamp: firebase.database.ServerValue.TIMESTAMP,
       user: {
@@ -75,12 +72,10 @@ class MessageForm extends Component {
     } else {
       message['content'] = this.state.message;
     }
-    console.log('createMessage', message);
     return message;
   };
 
   uploadFile = (file, metadata) => {
-    console.log('upload file');
     const pathToUpload = this.state.channel.id;
     // const { msessageCollection } = this.props; // does not work, so we create an instance here
     const msessageCollection = firebase.database().ref('messages');
@@ -133,7 +128,6 @@ class MessageForm extends Component {
   };
 
   sendFileMessage = (fileUrl, ref, pathToUpload) => {
-    console.log('sending file message...', fileUrl, pathToUpload);
     ref
       .child(pathToUpload)
       .push()

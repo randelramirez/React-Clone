@@ -3,6 +3,7 @@ import { Segment, Input, Button } from 'semantic-ui-react';
 import firebase from '../../firebase';
 import FileModal from './FileModal';
 import uuidv4 from 'uuid';
+import ProgressBar from './ProgressBar';
 
 class MessageForm extends Component {
   state = {
@@ -31,12 +32,12 @@ class MessageForm extends Component {
 
   sendMessage = () => {
     // const { msessageCollection } = this.props; // does not work, so we create an instance here
-    const msessageCollection = firebase.database().ref('messages');
+    const { getMessageCollection } = this.props; //firebase.database().ref('messages');
     const { message, channel } = this.state;
 
     if (message) {
       this.setState({ loading: true });
-      msessageCollection
+      getMessageCollection()
         .child(channel.id)
         .push()
         .set(this.createMessage())
@@ -75,11 +76,20 @@ class MessageForm extends Component {
     return message;
   };
 
+  getPath = () => {
+    if (this.props.isPrivateChannel) {
+      return `chat/private-${this.state.channel.id}`;
+    } else {
+      return 'chat/public';
+    }
+  };
+
   uploadFile = (file, metadata) => {
     const pathToUpload = this.state.channel.id;
-    // const { msessageCollection } = this.props; // does not work, so we create an instance here
-    const msessageCollection = firebase.database().ref('messages');
-    const filePath = `chat/public/${uuidv4()}.jpg`;
+    const msessageCollection = this.props.getMessageCollection(); // does not work, so we create an instance here
+
+    // const msessageCollection = firebase.database().ref('messages');
+    const filePath = `${this.getPath()}/${uuidv4()}.jpg`;
 
     this.setState(
       {
@@ -142,7 +152,14 @@ class MessageForm extends Component {
   };
 
   render() {
-    const { errors, message, loading, modal } = this.state;
+    const {
+      errors,
+      message,
+      loading,
+      modal,
+      percentUploaded,
+      uploadState,
+    } = this.state;
 
     return (
       <Segment className="message__form">
@@ -171,18 +188,25 @@ class MessageForm extends Component {
             disabled={loading}
           />
           <Button
+            disabled={uploadState === 'uploading'}
             onClick={this.openModal}
             color="teal"
             content="Upload Media"
             labelPosition="right"
             icon="cloud upload"
           />
-          <FileModal
-            uploadFile={this.uploadFile}
-            modal={modal}
-            closeModal={this.closeModal}
-          />
         </Button.Group>
+        <FileModal
+          uploadFile={this.uploadFile}
+          modal={modal}
+          closeModal={this.closeModal}
+        />
+        {uploadState === 'uploading' && (
+          <ProgressBar
+            uploadState={uploadState}
+            percentUploaded={percentUploaded}
+          />
+        )}
       </Segment>
     );
   }

@@ -36,6 +36,7 @@ class MessageForm extends Component {
     const { message, channel } = this.state;
 
     if (message) {
+      console.log('getMessageCollection', getMessageCollection);
       this.setState({ loading: true });
       getMessageCollection()
         .child(channel.id)

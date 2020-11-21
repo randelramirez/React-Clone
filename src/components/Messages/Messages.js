@@ -180,7 +180,7 @@ class Messages extends React.Component {
 
   render() {
     // prettier-ignore
-    const { messageCollection, messages, channel, user, numberOfUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
+    const { messages, channel, user, numberOfUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
 
     return (
       <React.Fragment>
@@ -203,11 +203,10 @@ class Messages extends React.Component {
         </Segment>
 
         <MessageForm
-          messagesRef={messageCollection}
           currentChannel={channel}
           currentUser={user}
           isPrivateChannel={privateChannel}
-          getMessagCollection={this.getMessagesRef}
+          getMessageCollection={this.getMessageCollection}
         />
       </React.Fragment>
     );

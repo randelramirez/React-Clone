@@ -8,6 +8,7 @@ import ProgressBar from './ProgressBar';
 class MessageForm extends Component {
   state = {
     storageRef: firebase.storage().ref(),
+    typingRef: firebase.database().ref('typing'),
     percentUploaded: 0,
     uploadTask: null,
     uploadState: '',
@@ -30,13 +31,24 @@ class MessageForm extends Component {
   handleChange = (event) =>
     this.setState({ [event.target.name]: event.target.value });
 
+  handleKeyDown = () => {
+    const { message, typingRef, channel, user } = this.state;
+    console.log(message.length);
+    console.log('typing message', message);
+    if (message) {
+      console.log('typing...');
+      typingRef.child(channel.id).child(user.uid).set(user.displayName);
+    } else {
+      typingRef.child(channel.id).child(user.uid).remove();
+    }
+  };
+
   sendMessage = () => {
     // const { msessageCollection } = this.props; // does not work, so we create an instance here
     const { getMessageCollection } = this.props; //firebase.database().ref('messages');
-    const { message, channel } = this.state;
+    const { message, channel, user, typingRef } = this.state;
 
     if (message) {
-      console.log('getMessageCollection', getMessageCollection);
       this.setState({ loading: true });
       getMessageCollection()
         .child(channel.id)
@@ -44,12 +56,13 @@ class MessageForm extends Component {
         .set(this.createMessage())
         .then(() => {
           this.setState({ loading: false, message: '', errors: [] });
+          typingRef.child(channel.id).child(user.uid).remove();
         })
-        .catch((error) => {
-          console.error(error);
+        .catch((err) => {
+          console.error(err);
           this.setState({
             loading: false,
-            errors: this.state.errors.concat(error),
+            errors: this.state.errors.concat(err),
           });
         });
     } else {
@@ -158,49 +171,50 @@ class MessageForm extends Component {
       message,
       loading,
       modal,
-      percentUploaded,
       uploadState,
+      percentUploaded,
     } = this.state;
 
     return (
       <Segment className="message__form">
         <Input
           fluid
-          value={message}
-          onChange={this.handleChange}
           name="message"
+          onChange={this.handleChange}
+          onKeyDown={this.handleKeyDown}
+          value={message}
           style={{ marginBottom: '0.7em' }}
-          label={<Button icon="add" />}
+          label={<Button icon={'add'} />}
+          labelPosition="left"
           className={
             errors.some((error) => error.message.includes('message'))
               ? 'error'
               : ''
           }
-          labelPosition="left"
           placeholder="Write your message"
         />
         <Button.Group icon widths="2">
           <Button
             onClick={this.sendMessage}
+            disabled={loading}
             color="orange"
             content="Add Reply"
             labelPosition="left"
             icon="edit"
-            disabled={loading}
           />
           <Button
+            color="teal"
             disabled={uploadState === 'uploading'}
             onClick={this.openModal}
-            color="teal"
             content="Upload Media"
             labelPosition="right"
             icon="cloud upload"
           />
         </Button.Group>
         <FileModal
-          uploadFile={this.uploadFile}
           modal={modal}
           closeModal={this.closeModal}
+          uploadFile={this.uploadFile}
         />
         {uploadState === 'uploading' && (
           <ProgressBar

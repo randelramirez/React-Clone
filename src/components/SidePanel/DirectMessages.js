@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { Icon, Menu } from 'semantic-ui-react';
+import React from 'react';
 import firebase from '../../firebase';
 import { connect } from 'react-redux';
 import { setCurrentChannel, setPrivateChannel } from '../../actions';
+import { Menu, Icon } from 'semantic-ui-react';
 
-class DirectMessages extends Component {
+class DirectMessages extends React.Component {
   state = {
     activeChannel: '',
     user: this.props.currentUser,
@@ -20,9 +20,18 @@ class DirectMessages extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.removeListeners();
+  }
+
+  removeListeners = () => {
+    this.state.usersCollection.off();
+    this.state.presenceCollection.off();
+    this.state.connectedCollection.off();
+  };
+
   addListeners = (currentUserUid) => {
     let loadedUsers = [];
-
     this.state.usersCollection.on('child_added', (snapshot) => {
       if (currentUserUid !== snapshot.key) {
         let user = snapshot.val();
@@ -37,9 +46,9 @@ class DirectMessages extends Component {
       if (snapshot.val() === true) {
         const ref = this.state.presenceCollection.child(currentUserUid);
         ref.set(true);
-        ref.onDisconnect().remove((error) => {
-          if (error != null) {
-            console.error(error);
+        ref.onDisconnect().remove((err) => {
+          if (err !== null) {
+            console.error(err);
           }
         });
       }
@@ -59,11 +68,11 @@ class DirectMessages extends Component {
   };
 
   addStatusToUser = (userId, connected = true) => {
-    const updatedUsers = this.state.users.reduce((accumulator, user) => {
+    const updatedUsers = this.state.users.reduce((acc, user) => {
       if (user.uid === userId) {
         user['status'] = `${connected ? 'online' : 'offline'}`;
       }
-      return accumulator.concat(user);
+      return acc.concat(user);
     }, []);
     this.setState({ users: updatedUsers });
   };
@@ -82,10 +91,10 @@ class DirectMessages extends Component {
   };
 
   getChannelId = (userId) => {
-    const currentUserUid = this.state.user.uid;
-    return userId < currentUserUid
-      ? `${userId}/${currentUserUid}`
-      : `${currentUserUid}/${userId}`;
+    const currentUserId = this.state.user.uid;
+    return userId < currentUserId
+      ? `${userId}/${currentUserId}`
+      : `${currentUserId}/${userId}`;
   };
 
   setActiveChannel = (userId) => {

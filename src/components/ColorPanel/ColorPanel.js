@@ -2,8 +2,16 @@ import React from 'react';
 import firebase from '../../firebase';
 import { connect } from 'react-redux';
 import { setColors } from '../../actions';
-// prettier-ignore
-import { Sidebar, Menu, Divider, Button, Modal, Icon, Label, Segment } from "semantic-ui-react";
+import {
+  Sidebar,
+  Menu,
+  Divider,
+  Button,
+  Modal,
+  Icon,
+  Label,
+  Segment,
+} from 'semantic-ui-react';
 import { SliderPicker } from 'react-color';
 
 class ColorPanel extends React.Component {
@@ -21,6 +29,14 @@ class ColorPanel extends React.Component {
       this.addListener(this.state.user.uid);
     }
   }
+
+  componentWillUnmount() {
+    this.removeListener();
+  }
+
+  removeListener = () => {
+    this.state.usersRef.child(`${this.state.user.uid}/colors`).off();
+  };
 
   addListener = (userId) => {
     let userColors = [];
@@ -52,7 +68,7 @@ class ColorPanel extends React.Component {
         console.log('Colors added');
         this.closeModal();
       })
-      .catch((error) => console.error(error));
+      .catch((err) => console.error(err));
   };
 
   displayUserColors = (colors) =>

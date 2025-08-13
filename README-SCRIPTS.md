@@ -14,8 +14,8 @@ This directory contains scripts to easily start both the frontend and backend de
 
 **Usage:**
 ```bash
-# Navigate to the New directory
-cd /path/to/ReactSlack/New
+# Navigate to the React-Clone directory
+cd /path/to/React-Clone
 
 # Run the script
 ./dev-server.sh
@@ -34,8 +34,8 @@ cd /path/to/ReactSlack/New
 
 **Usage:**
 ```powershell
-# Navigate to the New directory
-cd C:\path\to\ReactSlack\New
+# Navigate to the React-Clone directory
+cd C:\path\to\React-Clone
 
 # Run the script (you may need to enable script execution first)
 powershell -ExecutionPolicy Bypass -File .\dev-server.ps1
@@ -76,20 +76,20 @@ If you prefer to start servers manually:
 
 ### Terminal 1 - MongoDB:
 ```bash
-cd /path/to/ReactSlack/New
+cd /path/to/React-Clone
 docker-compose -f docker-compose-mongodb.yml up -d
 ```
 
 ### Terminal 2 - Backend:
 ```bash
-cd /path/to/ReactSlack/New/backend
+cd /path/to/React-Clone/backend
 npm install  # if first time
 npm run dev
 ```
 
 ### Terminal 3 - Frontend:
 ```bash
-cd /path/to/ReactSlack/New/frontend
+cd /path/to/React-Clone/frontend
 npm install  # if first time
 npm run dev
 ```

@@ -25,14 +25,16 @@ export const Login: React.FC = () => {
       await login(email, password);
       toast.success('Welcome back!');
       navigate('/');
-    } catch (error: unknown) {
+        } catch (error: unknown) {
       let errorMessage = 'Login failed';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === 'object' && error !== null && 'response' in error) {
+      
+      if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response?: { data?: { message?: string } } };
         errorMessage = axiosError.response?.data?.message || 'Login failed';
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
       }
+      
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

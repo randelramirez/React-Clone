@@ -1,4 +1,4 @@
-# ReactSlack - Modern Slack Clone
+# ReactSlack - Modernized
 
 A real-time chat application built with Node.js, Express, MongoDB, React, and TypeScript, featuring modern messaging capabilities with Socket.IO for real-time communication.
 

@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { Message } from '../models/Message.js';
 import { Channel } from '../models/Channel.js';
 import { IUser } from '../models/User.js';
@@ -16,6 +17,20 @@ router.get('/channel/:channelId', authenticateToken, async (req: AuthRequest, re
     const { channelId } = req.params;
     const { page = 1, limit = 50 } = req.query;
     const userId = req.user?._id;
+
+    // Handle the case where channelId is not a valid ObjectId (like 'general')
+    if (!mongoose.Types.ObjectId.isValid(channelId)) {
+      // Return empty messages for non-ObjectId channel IDs (like the default 'general')
+      return res.json({
+        messages: [],
+        pagination: {
+          page: parseInt(page as string),
+          limit: parseInt(limit as string),
+          total: 0,
+          hasMore: false
+        }
+      });
+    }
 
     // Check if user has access to the channel
     const channel = await Channel.findOne({
@@ -70,6 +85,11 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 
     if (!channelId) {
       return res.status(400).json({ message: 'Channel ID is required' });
+    }
+
+    // Handle the case where channelId is not a valid ObjectId (like 'general')
+    if (!mongoose.Types.ObjectId.isValid(channelId)) {
+      return res.status(400).json({ message: 'Invalid channel ID. Please select a valid channel.' });
     }
 
     // Check if user has access to the channel
